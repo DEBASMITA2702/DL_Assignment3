@@ -99,7 +99,7 @@ class Train:
         neruonsInFC, bidirectional, dropoutProb, learningRate, fontName
     ):
         '''loads dataset'''
-        lang = "bn"
+        lang = os.path.basename(os.path.dirname(root))
         d = DatasetLoad()
         d.loadDataset(root, lang)
         d.loadTestDataset(root, lang)
