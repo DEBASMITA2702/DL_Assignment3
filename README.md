@@ -107,6 +107,67 @@ python train.py -t 1
 This will run the model with default parameters and print the test accuracy and loss.
 
 
+## Code Organization
+- WordEmbeddings_Create.py: Subclasses the base implementation to provide createWordEmbeddings(), which builds and pads embedding tensors for both English and Bengali datasets.
+- WordEmbeddings_Translate.py: Defines translateWordToTensor(), converting individual words into character‐index tensors (with start/end tokens) based on the provided vocabulary.
+
+- EncoderArchitecture.py: Defines the EncoderStack class’s constructor (__init__), setting up all model parameters, dropout, RNN cell, and embedding layer.
+- EncoderArchitecture_Forward.py: Imports that base class and adds the forward() method implementation, handling embedding lookup, RNN evaluation, bidirectional processing, and attention.
+
+- DecoderArchitecture.py: Sets up the decoder’s constructor (__init__), building RNN cell, dropout, embedding and FC layers.
+- DecoderArchitecture_Forward.py subclasses it to provide the forward() logic with attention, gating, and output generation.
+
+- CombinedModelArchitecture_Utils.py: Contains the helper functions formMatrix (zero-tensor creation) and doTeacherForcing.
+- CombinedModelArchitecture_stack.py: Defines the EncoderDecoderStack class, importing and using those utilities to implement the encoder–decoder forward pass.
+
+- AccuracyAndLoss_Utils.py: Contains the calculate function that computes batch-level loss and correct prediction count.
+- FindAccuracyAndLoss.py: Defines the FindAccuracyAndLoss class with findAccuracyAndLoss(), which uses calculate to evaluate an entire dataset.
+
+- RunTrainer_Utils.py: Contains the modification() helper function for reshaping model outputs and target sequences.
+- RunTrainer.py: Defines the Trainer class with runModelTrainer(), driving the full training loop and logging.
+
+- LoadDataset_Train.py: Defines loadDataset(), which loads training and validation CSVs into self.train_dataset and self.val_dataset.
+- LoadDataset_Test.py: Defines loadTestDataset(), declares the DatasetLoad class, and attaches both loadDataset (imported) and loadTestDataset methods to it.
+
+- PrepareVocabulary_Final.py: Defines PrepareVocabulary with its constructor (__init__), sets up token indices and attaches the split methods.
+- PrepareVocabulary_Initialize.py: Implements initializeVocabularyDictionaries(self), initializing start/end/padding tokens in the English and Bengali dictionaries.
+- PrepareVocabulary_Create.py: Implements createVocabulary(self, dataset), iterating over the dataset to build and count character vocabularies.
+
+- ModelTrainDriver_Initialize.py: Defines the Model class with its constructor (__init__), setting up dataset handles, vocabulary sizes, and run flags.
+- ModelTrainDriver_Framework.py: Imports Model, defines and attaches the createModelFramework() method, implementing encoder/decoder creation, training, and testing logic.
+
+- ModelForTest_Utils.py: Exports calculate(), createCsv(), and createPlot() utility functions for computing metrics and generating CSV/plots.
+- ModelForTest_Run.py: Defines the RunTestOnBestModel class with testAndGivePredictions(), which imports and uses those utilities to run inference, evaluate, and output results.
+
+- ModelForTestAttention_Utils.py: Contains the standalone functions calculate(), createCsv(), and createPlot() for evaluating and visualizing attention-based model predictions.
+- ModelForTestAttention_Run.py: Defines the RunTestOnBestModel class with testAndGivePredictions(), which imports and uses those utility functions to run tests and output results.
+
+- Question2.py: Sets up and runs a Weights & Biases hyperparameter sweep for the vanilla encoder–decoder model by loading datasets, building vocabulary and embeddings, creating DataLoaders, naming runs, and launching a Bayes sweep agent for training.
+
+- Question3_4.py: Tests the best-configured vanilla encoder–decoder model by loading datasets, preparing vocabulary and embeddings, constructing DataLoaders, running inference via RunTestOnBestModel, and logging prediction images to Wandb.
+
+- Question5_a.py: Sets up and runs a hyperparameter sweep for the attention-enabled encoder–decoder model by loading datasets, preparing vocabulary and embeddings, creating DataLoaders, naming runs, and initiating the sweep agent.
+
+- Question5_b.py: Runs inference on the best attention-based encoder–decoder model by loading datasets, preparing vocabulary and embeddings, building DataLoaders, instantiating the model with optimal settings, generating predictions via RunTestOnBestModel, and logging the results to Wandb.
+
+- Question5_c_Main.py: Loads the vanilla and attention prediction CSVs, identifies which cases attention corrected seq2seq’s errors, and saves a combined CSV.
+- Question5_c_Plot.py: Reads that combined CSV, samples 10 entries, computes per-word character-differences for both models, generates an HTML comparison plot, and logs it to Weights & Biases.
+
+- Heatmap_Core.py: Provides low‐level routines (createPlot, createAttentionPerCharacter, createHeatMap) for constructing subplots, slicing attention matrices, and drawing individual heatmap panels.
+- Heatmap_Run.py: Implements plotAttn(), which wires together your model’s forward pass, invokes the core plotting functions for each sample, saves the figure, and logs it to Weights & Biases.
+
+- Question5_d_Main.py: Handles all data loading, vocabulary and embedding setup, and selects the specific word indices to visualize.
+- Question5_d_Heatmap.py: Takes the prepared data, instantiates the best‐configuration model, runs it, and finally plots the attention heatmaps.
+
+- train_argument.py: Contains the full arguments() function for parsing CLI options.
+- train.py: Imports arguments from train_args.py, and runs the overall code with wandb.login(), the main() driver, the Train class, and the main block
+
+-- I’ve divided Utilities.py into five logical modules---------
+- Utilities_Device_Trainings.py: Environment & training helpers (setDevice, setOptimizer, setLossFunction, setOutputFunction, clipGradient).
+- Utilities_Layer.py: Layer factories (createEmbeddingLayer, createLinearLayer, createDropoutLayer).
+- Utilities_Tensor.py: Core tensor operations (dimension, replication, reshaping, arithmetic, extraction).
+- Utilities_Sequence.py: Sequence and decoder helpers (runDecoderWithNoTeacherForcing, getBatchFloorValue).
+- Utilities_Plotting.py: HTML table plotting and formatter utilities (plotHtml, plotHtmlComparison, createXandYticks, getNullObject, getFormatObject).
 
 
 ## Additional features
@@ -123,7 +184,6 @@ The following features are also supported
     ```
     python train.py --font <name_of_the_font_file>.TTF
     ```
-  
   
 
 ## Links
