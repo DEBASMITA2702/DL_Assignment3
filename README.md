@@ -159,8 +159,11 @@ This will run the model with default parameters and print the test accuracy and 
 - Question5_d_Main.py: Handles all data loading, vocabulary and embedding setup, and selects the specific word indices to visualize.
 - Question5_d_Heatmap.py: Takes the prepared data, instantiates the best‐configuration model, runs it, and finally plots the attention heatmaps.
 
+- AttentionWeightsFetch.py: Provides a utility function to extract, process, and plot character-level attention weight matrices from a trained encoder–decoder model—handling tensor reshaping, index-to-character mapping, and rendering heatmaps with matplotlib and seaborn.
+- Question6.py: Selects a random correctly translated word pair from my generated .csv, invokes the best attention-enabled model to retrieve its attention matrix, visualizes the attention heatmap over English–Bengali characters, and logs the figure to Wandb.
+
 - train_argument.py: Contains the full arguments() function for parsing CLI options.
-- train.py: Imports arguments from train_args.py, and runs the overall code with wandb.login(), the main() driver, the Train class, and the main block
+- train.py: Imports arguments from train_args.py, and acts as the main training driver, parsing command-line hyperparameter overrides, initializing a W&B run, loading and embedding datasets, building and training encoder–decoder models (with optional attention and heatmap steps), and executing testing routines including attention-based predictions and visualizations.
 
 -- I’ve divided Utilities.py into five logical modules---------
 - Utilities_Device_Trainings.py: Environment & training helpers (setDevice, setOptimizer, setLossFunction, setOutputFunction, clipGradient).
