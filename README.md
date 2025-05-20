@@ -47,7 +47,7 @@ The project supports all the three types of cells with the encoder and decoder a
 
     You need to specify the path of the specific language directory inside the dataset. For example if you want to run on Telugu dataset then run it like :
     ```
-    python train.py --root Dakshina/tel/lexicons
+    python train.py --root Dakshina/te/lexicons
     ```
 
 - Dataset is placed outside the project directory
