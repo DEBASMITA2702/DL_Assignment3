@@ -1,3 +1,4 @@
+%%writefile AttentionWeightsFetch.py
 import torch
 import matplotlib.pyplot as plt
 from matplotlib.font_manager import FontProperties
@@ -14,7 +15,7 @@ def plotAttn(model,
              fontName='/kaggle/input/bengalifont/BengaliFont.ttf'):
     """
     Parameters:
-      - model: your encoder–decoder framework
+      - model: your encoder-decoder framework
       - inputSequence: LongTensor [B, src_len] or list [src_str]
       - outputSequence: LongTensor [B, tgt_len] or list [tgt_str]
       - vocabulary: PrepareVocabulary instance
@@ -25,7 +26,7 @@ def plotAttn(model,
 
     model.eval()
 
-    # 1) Auto-convert from list[str] → LongTensor of indices
+    ''' Auto-convert from list[str] → LongTensor of indices'''
     if isinstance(inputSequence, list):
         eng_str = inputSequence[0]
         # map characters → indices
@@ -42,32 +43,30 @@ def plotAttn(model,
         outputSequence = torch.LongTensor([bn_idxs])
 
     with torch.no_grad():
-        # transpose & send to device
+        '''transpose & send to device'''
         src = Utilities_Device_Trainings.setDevice(inputSequence.T)
         tgt = Utilities_Device_Trainings.setDevice(outputSequence.T)
-
-        # forward pass → (raw preds, attention tensor)
         modelEval, attention = model(src, tgt, teacherRatio=0.0)
 
-        # collapse batch/time dims
+        ''' collapse batch/time dims'''
         modelEval = Utilities_Tensor.extractColumn(modelEval)
         attention = Utilities_Tensor.extractColumn(attention)
         attn_seq = modelEval.argmax(dim=2)
 
-        # reorder to [batch, tgt_len, src_len]
+        ''' reorder to [batch, tgt_len, src_len]'''
         attention = Utilities_Tensor.reorderDimensions(attention, 1, 0, 2)
 
-        # transpose inputs back
+        ''' transpose inputs back'''
         src = src.T
         attn_seq = attn_seq.T
 
-        # prepare plotting grid
+        ''' prepare plotting grid'''
         _, axes = createPlot()
 
         attention_matrix = None
         B = src.size(0)
         for row in range(B):
-            # find true lengths (stop at EOS)
+            ''' find true lengths'''
             src_len = (src[row] == vocabulary.endOfSequenceIndex).nonzero(as_tuple=True)
             src_len = src_len[0][0].item()+1 if src_len[0].numel()>0 else src.size(1)
 
@@ -75,21 +74,21 @@ def plotAttn(model,
             tgt_len = (tgt_seq == vocabulary.endOfSequenceIndex).nonzero(as_tuple=True)
             tgt_len = tgt_len[0][0].item()+1 if tgt_len[0].numel()>0 else tgt_seq.size(0)
 
-            # build [tgt_len x src_len] attention-per-char
+            ''' build [tgt_len x src_len] attention-per-char '''
             attentionPerCharacter = createAttentionPerCharacter(
                 attention, row, tgt_len, src_len
             )
 
-            # stash the real attention weights
+            '''putting the real attention weights'''
             attention_matrix = attentionPerCharacter.cpu().numpy()
 
-            # build tick labels
+            ''' build tick labels'''
             xTicks, yTicks = Utilities_Plotting.createXandYticks(
                 tgt_len, src_len, vocabulary,
                 attn_seq, src, row
             )
 
-            # plot into the grid
+            '''plot into the grid'''
             if row < len(axes):
                 axes = createHeatMap(
                     attentionPerCharacter, axes, row,
@@ -97,8 +96,7 @@ def plotAttn(model,
                     xTicks, yTicks,
                     fontName
                 )
-
-        # close figure
+                
         plt.close()
 
     return attention_matrix
