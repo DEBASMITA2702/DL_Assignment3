@@ -45,9 +45,9 @@ The project supports all the three types of cells with the encoder and decoder a
     ```
   - Target language is different
 
-    You need to specify the path of the specific language directory inside the dataset. For example if you want to run on Telugu dataset then run it like :
+    You need to specify the path of the specific language directory inside the dataset. For example if you want to run on Telugu dataset ('te') then run it like :
     ```
-    python train.py --root Dakshina/te/lexicons
+    python train.py --root /kaggle/input/dataset/Dakshina/te/lexicons
     ```
 
 - Dataset is placed outside the project directory
