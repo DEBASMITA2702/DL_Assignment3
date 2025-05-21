@@ -15,6 +15,7 @@ import train_arguments
 import itertools
 import torch.utils as utils
 import random
+import os
 
 '''login to wandb to generate plot'''
 wandb.login()
